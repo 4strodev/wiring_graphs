@@ -81,16 +81,18 @@ func ExampleContainer_Fill_insideResolver() {
 
 	cont := container.New()
 	cont.Must().
-		Dependencies(func() string {
-			return "hello from Fill"
-		}).
-		Dependencies(func(c *container.Container) *ServerConfig {
-			var deps Deps
-			if err := c.Fill(&deps); err != nil {
-				panic(err)
-			}
-			return &ServerConfig{Host: deps.Greeting, Port: 8080}
-		})
+		Dependencies(
+			func() string {
+				return "hello from Fill"
+			},
+			func(c *container.Container) *ServerConfig {
+				var deps Deps
+				if err := c.Fill(&deps); err != nil {
+					panic(err)
+				}
+				return &ServerConfig{Host: deps.Greeting, Port: 8080}
+			},
+		)
 
 	cfg, err := container.Resolve[*ServerConfig](cont)
 	if err != nil {
@@ -132,8 +134,10 @@ func ExampleContainer_Derived() {
 func ExampleContainer_DetectCircularDependencies() {
 	cont := container.New()
 	cont.Must().
-		Dependencies(func() string { return "hello" }).
-		Dependencies(func(s string) int { return len(s) })
+		Dependencies(
+			func() string { return "hello" },
+			func(s string) int { return len(s) },
+		)
 
 	// DetectCircularDependencies runs a DFS-based check on the dependency graph.
 	// Returns nil when there are no cycles.

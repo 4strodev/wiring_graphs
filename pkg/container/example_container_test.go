@@ -58,12 +58,13 @@ func ExampleContainer_Dependencies_withDependencies() {
 
 	// Resolver input parameters are resolved automatically from the container.
 	cont.Must().
-		Dependencies(func() *bytes.Buffer {
-			return bytes.NewBufferString("hello")
-		}).
-		Dependencies(func(buf *bytes.Buffer) string {
-			return fmt.Sprintf("got: %s", buf.String())
-		})
+		Dependencies(
+			func() *bytes.Buffer {
+				return bytes.NewBufferString("hello")
+			}, func(buf *bytes.Buffer) string {
+				return fmt.Sprintf("got: %s", buf.String())
+			},
+		)
 
 	result, _ := container.Resolve[string](cont)
 	fmt.Println(result)

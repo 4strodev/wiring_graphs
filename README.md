@@ -192,18 +192,20 @@ type ServiceDeps struct {
 }
 
 cont.Must().
-    Singleton(func() *slog.Logger {
-        return slog.New(slog.NewJSONHandler(os.Stdout, nil))
-    }).
+    Singleton(
+        func() *slog.Logger {
+            return slog.New(slog.NewJSONHandler(os.Stdout, nil))
+        },
+        // The *Container is automatically available for injection.
+        func(c *container.Container) *MyService {
+            var deps ServiceDeps
+            if err := c.Fill(&deps); err != nil {
+                panic(err)
+            }
+            return NewMyService(deps.Logger, deps.Buffer)
+        },
+    ).
     Token(map[string]any{
         "buffer": func() *bytes.Buffer { return bytes.NewBufferString("data") },
-    }).
-    // The *Container is automatically available for injection.
-    Singleton(func(c *container.Container) *MyService {
-        var deps ServiceDeps
-        if err := c.Fill(&deps); err != nil {
-            panic(err)
-        }
-        return NewMyService(deps.Logger, deps.Buffer)
     })
 ```

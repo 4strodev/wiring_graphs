@@ -25,10 +25,12 @@ func ExampleResolve() {
 func ExampleResolve_withDependencyChain() {
 	cont := container.New()
 	cont.Must().
-		Dependencies(func() int { return 42 }).
-		Dependencies(func(n int) string {
-			return fmt.Sprintf("the answer is %d", n)
-		})
+		Dependencies(
+			func() int { return 42 },
+			func(n int) string {
+				return fmt.Sprintf("the answer is %d", n)
+			},
+		)
 
 	result, err := container.Resolve[string](cont)
 	if err != nil {
