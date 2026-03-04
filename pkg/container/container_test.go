@@ -16,7 +16,7 @@ import (
 func TestDetectCircularDependencies(t *testing.T) {
 	cont := container.New()
 
-	err := cont.Transient(func(s io.Writer) (*slog.Logger, error) {
+	err := cont.Dependencies(func(s io.Writer) (*slog.Logger, error) {
 		return slog.New(slog.NewJSONHandler(s, nil)), errors.New("an artificial error")
 	}, func(logger *slog.Logger) testutils.MyService {
 		return testutils.MyService{}
@@ -32,7 +32,7 @@ func TestDetectCircularDependencies(t *testing.T) {
 func TestDetectCircularDependencies_SelfReference(t *testing.T) {
 	cont := container.New()
 
-	cont.Transient(func(s testutils.MyService) testutils.MyService {
+	cont.Dependencies(func(s testutils.MyService) testutils.MyService {
 		return testutils.MyService{}
 	})
 
@@ -43,7 +43,7 @@ func TestDetectCircularDependencies_SelfReference(t *testing.T) {
 func TestResolve(t *testing.T) {
 	cont := container.New()
 
-	cont.Transient(testutils.NewService)
+	cont.Dependencies(testutils.NewService)
 
 	_, err := container.Resolve[testutils.MyService](cont)
 	require.NoError(t, err, "testutils.MyService should be resolved")
@@ -56,7 +56,7 @@ func TestResolve_WithDependencies(t *testing.T) {
 		return bytes.NewBuffer([]byte{})
 	}
 
-	err := cont.Transient(dependantResolver, testutils.NewService)
+	err := cont.Dependencies(dependantResolver, testutils.NewService)
 	require.NoError(t, err)
 
 	_, err = container.Resolve[testutils.MyService](cont)
@@ -92,7 +92,7 @@ func TestResolveToken_WithDependencies(t *testing.T) {
 	err := cont.Token(map[string]any{"buffer": dependantResolver})
 	require.NoError(t, err)
 
-	cont.Transient(testutils.NewService)
+	cont.Dependencies(testutils.NewService)
 
 	buf, err := container.ResolveToken[*bytes.Buffer](cont, "buffer")
 	require.NoError(t, err)
@@ -102,14 +102,14 @@ func TestResolveToken_WithDependencies(t *testing.T) {
 func TestContainerDependency(t *testing.T) {
 	cont := container.New()
 
-	cont.Transient(testutils.NewService)
+	cont.Dependencies(testutils.NewService)
 	cont.Token(map[string]any{
 		"buffer": func() *bytes.Buffer {
 			return bytes.NewBuffer([]byte{})
 		}},
 	)
 
-	cont.Transient(func(c *container.Container) testutils.MyDeps {
+	cont.Dependencies(func(c *container.Container) testutils.MyDeps {
 		deps := testutils.MyDeps{}
 		err := c.Fill(&deps)
 		require.NoError(t, err)
@@ -126,7 +126,7 @@ func TestContainerDependency(t *testing.T) {
 func TestSingleton(t *testing.T) {
 	cont := container.New()
 
-	cont.Transient(func() *bytes.Buffer {
+	cont.Dependencies(func() *bytes.Buffer {
 		return bytes.NewBuffer([]byte{})
 	})
 
@@ -141,7 +141,7 @@ func TestSingleton(t *testing.T) {
 func TestDerived(t *testing.T) {
 	cont := container.New()
 
-	cont.Transient(func() *bytes.Buffer {
+	cont.Dependencies(func() *bytes.Buffer {
 		return bytes.NewBuffer([]byte{})
 	})
 

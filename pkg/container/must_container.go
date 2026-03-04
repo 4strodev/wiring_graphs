@@ -31,8 +31,9 @@ func (c *MustContainer) Token(dependencies map[string]any) *MustContainer {
 	return c
 }
 
+// Dependencies add multiple type-based transient dependencies
 func (c *MustContainer) Dependencies(resolvers ...any) *MustContainer  {
-	err := c.container.Transient(resolvers...)
+	err := c.container.Dependencies(resolvers...)
 	if err != nil {
 		panic(err)
 	}

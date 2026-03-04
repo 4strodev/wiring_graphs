@@ -23,7 +23,7 @@ type Container struct {
 	connected  bool
 }
 
-// Retuns a new container and sets a default dependency that allows
+// Returns a new container and sets a default dependency that allows
 // to inject this container as a parameter on the resolvers
 func New() *Container {
 	container := &Container{
@@ -33,7 +33,7 @@ func New() *Container {
 	}
 
 	// Allow resolvers to inject container
-	container.Transient(func() *Container {
+	container.Dependencies(func() *Container {
 		return container
 	})
 
@@ -52,7 +52,7 @@ func (c *Container) Must() *MustContainer {
 	}
 }
 
-func (c *Container) Transient(resolvers ...any) error {
+func (c *Container) Dependencies(resolvers ...any) error {
 	c.connected = false
 	for _, res := range resolvers {
 		config, err := buildConfig(res)
@@ -177,13 +177,13 @@ func (c *Container) DetectCircularDependencies() ([]*graph.Node[resolver.Depende
 func (c Container) getNodeFor(t reflect.Type) (*graph.Node[resolver.DependencyResolver[any]], error) {
 	node, ok := c.typeIndex[t]
 	if !ok {
-		return nil, errors.Errorf(errors.E_DEPENDENCY_NOT_FOUND, "dependency for %v not fonud", t)
+		return nil, errors.Errorf(errors.E_DEPENDENCY_NOT_FOUND, "dependency for %v not found", t)
 	}
 
 	return node.node, nil
 }
 
-// setConnections stablishes connections between nodes and
+// setConnections establishes connections between nodes and
 // look for circular dependencies
 func (c *Container) setConnections() error {
 	for node := range c.graph.GetNodes() {

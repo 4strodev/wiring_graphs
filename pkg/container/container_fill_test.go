@@ -16,7 +16,7 @@ func TestFill(t *testing.T) {
 		return bytes.NewBuffer([]byte{})
 	}
 
-	err := cont.Transient(dependantResolver, testutils.NewService)
+	err := cont.Dependencies(dependantResolver, testutils.NewService)
 	cont.Token(map[string]any{
 		"buffer": func() *bytes.Buffer {
 			return bytes.NewBuffer([]byte{})
