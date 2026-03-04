@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta2] - 2026-03-04
+
+### 🚀 Features
+
+- Prepare container for parent child
+- Improve errors and tasks
+
+### 🚜 Refactor
+
+- Rename to Transient
+- Rename Transient to Dependencies
+
+### 📚 Documentation
+
+- Add readme and update changelog
+- Add AGENTS.md
+- Add examples on README.md
+
+### 🧪 Testing
+
+- Testing derived container
+- Add example tests
+
 ## [1.0.0-beta] - 2025-08-01
 
 ### 🚀 Features
