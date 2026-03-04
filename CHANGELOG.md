@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta3]
+
+### 🚜 Refactor
+
+- Declare multiple resolvers with a single call in examples
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelog
+
 ## [1.0.0-beta2] - 2026-03-04
 
 ### 🚀 Features
