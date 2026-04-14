@@ -40,7 +40,7 @@ func (g Graph[T]) GetRootNodes() []*Node[T] {
 	return rootNodes
 }
 
-// DetectCircularRelations using BFS detects circular relations between nodes on this graph
+// DetectCircularRelations using DFS detects circular relations between nodes on this graph
 func (g Graph[T]) DetectCircularRelations() ([]*Node[T], bool) {
 	for node := range g.nodes {
 		if !node.HasConnections() {

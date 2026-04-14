@@ -22,11 +22,17 @@ type Node[T any] struct {
 
 func NewNode[T any](v T) *Node[T] {
 	return &Node[T]{
-		Val: v,
+		Val:         v,
 		connections: make(map[*Node[T]]connectionDirection),
 	}
 }
 
+func (n Node[T]) GetConnection(node *Node[T]) (connectionDirection, bool) {
+	direction, ok := n.connections[node]
+	return direction, ok
+}
+
+// Deprecated: in favor of GetConnection
 func (n Node[T]) IsConnectedWith(node *Node[T]) bool {
 	_, ok := n.connections[node]
 	return ok

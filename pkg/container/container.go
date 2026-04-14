@@ -1,6 +1,7 @@
 package container
 
 import (
+	"maps"
 	"reflect"
 
 	"github.com/4strodev/wiring_graphs/pkg/errors"
@@ -43,6 +44,10 @@ func New() *Container {
 func (c *Container) Derived() *Container {
 	childContainer := New()
 	childContainer.parent = c
+	childContainer.typeIndex = make(map[reflect.Type]*resolverConfig)
+
+	maps.Copy(childContainer.typeIndex, c.typeIndex)
+
 	return childContainer
 }
 
@@ -195,8 +200,8 @@ func (c *Container) setConnections() error {
 				return errors.Errorf(
 					errors.E_CIRCULAR_DEPENDENCY,
 					"circular dependency found: %v",
-					[]*graph.Node[resolver.DependencyResolver[any]]{
-						node,
+					[]string{
+						node.Val.Type().Name(),
 					})
 			}
 
@@ -205,14 +210,14 @@ func (c *Container) setConnections() error {
 				return err
 			}
 
-			if dependencyNode.IsConnectedWith(node) {
+			if direction, ok := dependencyNode.GetConnection(node); ok && direction == graph.IN {
 				return errors.Errorf(
 					errors.E_CIRCULAR_DEPENDENCY,
 					"circular dependency found: %v",
-					[]*graph.Node[resolver.DependencyResolver[any]]{
-						node,
-						dependencyNode,
-						node,
+					[]string{
+						node.Val.Type().Name(),
+						dependencyNode.Val.Type().Name(),
+						node.Val.Type().Name(),
 					},
 				)
 			}
@@ -222,6 +227,10 @@ func (c *Container) setConnections() error {
 	}
 
 	cicle, hasCicle := c.graph.DetectCircularRelations()
+	var typeNames []string = make([]string, len(cicle))
+	for i, typeData := range cicle {
+		typeNames[i] = typeData.Val.Type().Name()
+	}
 	if hasCicle {
 		return errors.Errorf(errors.E_CIRCULAR_DEPENDENCY, "circular dependency found: %v", cicle)
 	}
